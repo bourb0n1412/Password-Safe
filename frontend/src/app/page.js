@@ -1,73 +1,101 @@
-"use client";
+import Image from "next/image";
 
-// pages/index.js
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-const LoginPage = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isLogin, setIsLogin] = useState(true); // Toggle between Login and Register
-  const router = useRouter();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Simple validation
-    if (!username || !password) {
-      setErrorMessage('Bitte Benutzername und Passwort eingeben.');
-      return;
-    }
-
-    if (isLogin) {
-      // Skip backend for now and directly go to dashboard
-      router.push('/dashboard'); // Redirect to the dashboard upon successful login
-    } else {
-      // Placeholder for registration logic
-      alert('Registrierung erfolgreich!');
-      setIsLogin(true); // Switch back to Login view
-    }
-  };
-
+export default function Home() {
   return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'linear-gradient(to bottom, #74ebd5, #acb6e5)' }}>
-        <form onSubmit={handleSubmit} style={{ padding: '2rem', borderRadius: '8px', background: '#ffffff', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
-          <h1 style={{ textAlign: 'center', marginBottom: '1rem', color: '#333', fontWeight: '600' }}>{isLogin ? 'Login' : 'Registrieren'}</h1>
-          {errorMessage && <p style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</p>}
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '.5rem', color: '#555' }}>Benutzername</label>
-            <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                style={{ width: '100%', padding: '.5rem', borderRadius: '4px', border: '1px solid #ccc', color: '#333' }}
-            />
-          </div>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '.5rem', color: '#555' }}>Passwort</label>
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={{ width: '100%', padding: '.5rem', borderRadius: '4px', border: '1px solid #ccc', color: '#333' }}
-            />
-          </div>
-          <button type="submit" style={{ width: '100%', padding: '.75rem', borderRadius: '4px', border: 'none', background: '#4CAF50', color: '#ffffff', fontWeight: '600', cursor: 'pointer' }}>
-            {isLogin ? 'Anmelden' : 'Registrieren'}
-          </button>
-          <p style={{ textAlign: 'center', marginTop: '1rem', color: '#555' }}>
-            {isLogin ? 'Noch kein Konto? ' : 'Bereits ein Konto? '}
-            <span
-                onClick={() => setIsLogin(!isLogin)}
-                style={{ color: '#4CAF50', cursor: 'pointer', textDecoration: 'underline' }}
-            >
-                        {isLogin ? 'Registrieren' : 'Login'}
-                    </span>
-          </p>
-        </form>
-      </div>
-  );
-};
+    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+        <Image
+          className="dark:invert"
+          src="/next.svg"
+          alt="Next.js logo"
+          width={180}
+          height={38}
+          priority
+        />
+        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
+          <li className="mb-2">
+            Get started by editing{" "}
+            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
+              src/app/page.js
+            </code>
+            .
+          </li>
+          <li>Save and see your changes instantly.</li>
+        </ol>
 
-export default LoginPage;
+        <div className="flex gap-4 items-center flex-col sm:flex-row">
+          <a
+            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
+            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Image
+              className="dark:invert"
+              src="/vercel.svg"
+              alt="Vercel logomark"
+              width={20}
+              height={20}
+            />
+            Deploy now
+          </a>
+          <a
+            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
+            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Read our docs
+          </a>
+        </div>
+      </main>
+      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
+        <a
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Image
+            aria-hidden
+            src="/file.svg"
+            alt="File icon"
+            width={16}
+            height={16}
+          />
+          Learn
+        </a>
+        <a
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Image
+            aria-hidden
+            src="/window.svg"
+            alt="Window icon"
+            width={16}
+            height={16}
+          />
+          Examples
+        </a>
+        <a
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Image
+            aria-hidden
+            src="/globe.svg"
+            alt="Globe icon"
+            width={16}
+            height={16}
+          />
+          Go to nextjs.org →
+        </a>
+      </footer>
+    </div>
+  );
+}
