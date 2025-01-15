@@ -100,6 +100,8 @@ Nach erfolgreicher Authentifizierung können die gespeicherten Daten entschlüss
 
 ## **Reflexion**
 
+Es gab einige Probleme mit der Sicherheit und den Rechten, hier unten sind die grössten davon aufgelistet, sowie die anschliessend Lösung für die Probleme.
+
 #### **Problem: Zugriff auf die H2-Konsole**
 **Beschreibung**: Sicherheitsrichtlinien wie X-Frame-Options blockierten den Zugriff.
 
