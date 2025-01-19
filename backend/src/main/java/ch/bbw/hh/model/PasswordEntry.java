@@ -7,15 +7,18 @@ public class PasswordEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String category; // z.B. "Privates"
+
+    private String category;
     private String url;
     private String username;
-    @Lob
-    private String encryptedPassword; // AES-verschlüsselt
+    private String encryptedPassword;
     private String email;
     private String notes;
-    // Getter und Setter
 
+    @ManyToOne
+    private User user;
+
+    // Getter und Setter
 
     public Long getId() {
         return id;
@@ -41,20 +44,20 @@ public class PasswordEntry {
         this.url = url;
     }
 
-    public String getEncryptedPassword() {
-        return encryptedPassword;
-    }
-
-    public void setEncryptedPassword(String encryptedPassword) {
-        this.encryptedPassword = encryptedPassword;
-    }
-
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getEncryptedPassword() {
+        return encryptedPassword;
+    }
+
+    public void setEncryptedPassword(String encryptedPassword) {
+        this.encryptedPassword = encryptedPassword;
     }
 
     public String getEmail() {
@@ -72,4 +75,14 @@ public class PasswordEntry {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
+
+

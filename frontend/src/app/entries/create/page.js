@@ -13,6 +13,7 @@ export default function CreateEntryPage() {
     notes: '',
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false); // Zustand für Ladeanzeige
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -23,21 +24,37 @@ export default function CreateEntryPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
+
+    const token = localStorage.getItem('token'); // Token abrufen
+    if (!token) {
+      setError('Du bist nicht angemeldet. Bitte melde dich an.');
+      router.push('/login');
+      return;
+    }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/entries`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Token hinzufügen
+        },
         body: JSON.stringify(formData),
       });
 
       if (response.ok) {
         router.push('/dashboard'); // Nach erfolgreicher Erstellung zurück zum Dashboard
       } else {
-        setError('Fehler beim Erstellen des Eintrags. Bitte versuchen Sie es erneut.');
+        const errorMessage = await response.text();
+        console.error('Fehler beim Erstellen des Eintrags:', errorMessage);
+        setError(`Fehler: ${errorMessage}`);
       }
     } catch (err) {
-      setError('Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.');
+      console.error('Netzwerkfehler:', err);
+      setError('Netzwerkfehler. Bitte überprüfe deine Verbindung.');
+    } finally {
+      setLoading(false); // Ladeanzeige deaktivieren
     }
   };
 
@@ -128,11 +145,13 @@ export default function CreateEntryPage() {
             />
           </div>
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {loading && <p className="text-blue-500 text-sm mb-4">Wird erstellt...</p>}
           <button
             type="submit"
             className="w-full py-2 px-4 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600"
+            disabled={loading} // Button während des Ladens deaktivieren
           >
-            Erstellen
+            {loading ? 'Erstellen...' : 'Erstellen'}
           </button>
         </form>
       </div>

@@ -18,24 +18,36 @@ export default function EditEntryPage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetchEntry();
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login'); // Weiterleitung zur Login-Seite, wenn kein Token vorhanden ist
+      return;
+    }
+    fetchEntry(token);
   }, []);
 
-  const fetchEntry = async () => {
+  const fetchEntry = async (token) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/entries/${id}`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Token anhängen
+        },
       });
 
       if (response.ok) {
         const data = await response.json();
         setFormData(data);
-        setLoading(false);
+        setLoading(false); // Laden abgeschlossen
+      } else if (response.status === 401) {
+        localStorage.removeItem('token'); // Token entfernen
+        router.push('/login'); // Weiterleitung zur Login-Seite
       } else {
         setError('Fehler beim Laden des Eintrags.');
       }
     } catch (err) {
+      console.error('Netzwerkfehler:', err);
       setError('Netzwerkfehler. Bitte versuchen Sie es später erneut.');
     }
   };
@@ -49,20 +61,31 @@ export default function EditEntryPage() {
     e.preventDefault();
     setError('');
 
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login'); // Weiterleitung zur Login-Seite, wenn kein Token vorhanden ist
+      return;
+    }
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/entries/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Token anhängen
+        },
         body: JSON.stringify(formData),
       });
 
       if (response.ok) {
         router.push('/dashboard'); // Zurück zum Dashboard
       } else {
-        setError('Fehler beim Aktualisieren des Eintrags. Bitte versuchen Sie es erneut.');
+        const errorMessage = await response.text();
+        setError(`Fehler beim Aktualisieren: ${errorMessage}`);
       }
     } catch (err) {
-      setError('Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.');
+      console.error('Netzwerkfehler:', err);
+      setError('Netzwerkfehler. Bitte versuchen Sie es später erneut.');
     }
   };
 

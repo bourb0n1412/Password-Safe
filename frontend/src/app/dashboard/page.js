@@ -6,17 +6,29 @@ import { useRouter } from 'next/navigation';
 export default function DashboardPage() {
   const [entries, setEntries] = useState([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    fetchEntries();
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      router.push('/login'); // Weiterleitung zur Login-Seite
+      return;
+    }
+
+    fetchEntries(token);
   }, []);
 
-  const fetchEntries = async () => {
+  const fetchEntries = async (token) => {
+    setLoading(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/entries`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (response.ok) {
@@ -26,14 +38,27 @@ export default function DashboardPage() {
         setError('Fehler beim Abrufen der Einträge.');
       }
     } catch (err) {
+      console.error('Netzwerkfehler:', err);
       setError('Netzwerkfehler. Bitte versuchen Sie es später erneut.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/entries/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (response.ok) {
@@ -42,9 +67,25 @@ export default function DashboardPage() {
         setError('Fehler beim Löschen des Eintrags.');
       }
     } catch (err) {
+      console.error('Netzwerkfehler:', err);
       setError('Netzwerkfehler. Bitte versuchen Sie es später erneut.');
     }
   };
+
+  const handleCopyPassword = (password) => {
+    navigator.clipboard.writeText(password).then(
+      () => alert('Passwort kopiert!'),
+      (err) => alert('Fehler beim Kopieren des Passworts.')
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-xl font-bold">Lädt...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -64,10 +105,24 @@ export default function DashboardPage() {
           >
             <div>
               <strong className="block text-lg font-semibold">{entry.category}</strong>
-              <p className="text-sm text-gray-600">URL: {entry.url}</p>
+              <a
+                href={entry.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline"
+              >
+                {entry.url}
+              </a>
               <p className="text-sm text-gray-600">Benutzername: {entry.username}</p>
+              <p className="text-sm text-gray-600">Notizen: {entry.notes || 'Keine Notizen'}</p>
             </div>
             <div className="flex space-x-2">
+              <button
+                onClick={() => handleCopyPassword(entry.encryptedPassword)}
+                className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Passwort kopieren
+              </button>
               <button
                 onClick={() => router.push(`/entries/${entry.id}`)}
                 className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"

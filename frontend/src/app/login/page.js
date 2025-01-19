@@ -14,21 +14,18 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/validate`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
       if (response.ok) {
-        const isValid = await response.json();
-        if (isValid) {
-          router.push('/dashboard'); // Weiterleitung zum Dashboard
-        } else {
-          setError('Ungültiger Benutzername oder Passwort.');
-        }
+        const data = await response.json();
+        localStorage.setItem('token', data.token); // Token im Local Storage speichern
+        router.push('/dashboard'); // Weiterleitung zum Dashboard
       } else {
-        setError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
+        setError('Ungültiger Benutzername oder Passwort.');
       }
     } catch (err) {
       setError('Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.');
