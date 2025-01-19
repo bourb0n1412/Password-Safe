@@ -13,8 +13,8 @@ export default function CreateEntryPage() {
     notes: '',
   });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // Zustand für Ladeanzeige
-  const [passwordStrength, setPasswordStrength] = useState(''); // Passwortstärke
+  const [loading, setLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState('');
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -22,7 +22,7 @@ export default function CreateEntryPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === 'encryptedPassword') {
-      validatePasswordStrength(value); // Passwortstärke prüfen
+      validatePasswordStrength(value);
     }
   };
 
@@ -51,7 +51,7 @@ export default function CreateEntryPage() {
       password += charset[randomIndex];
     }
     setFormData((prev) => ({ ...prev, encryptedPassword: password }));
-    validatePasswordStrength(password); // Generiertes Passwort prüfen
+    validatePasswordStrength(password);
   };
 
   const handleSubmit = async (e) => {
@@ -59,7 +59,7 @@ export default function CreateEntryPage() {
     setError('');
     setLoading(true);
 
-    const token = localStorage.getItem('token'); // Token abrufen
+    const token = localStorage.getItem('token');
     if (!token) {
       setError('Du bist nicht angemeldet. Bitte melde dich an.');
       router.push('/login');
@@ -71,13 +71,13 @@ export default function CreateEntryPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // Token hinzufügen
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
 
       if (response.ok) {
-        router.push('/dashboard'); // Nach erfolgreicher Erstellung zurück zum Dashboard
+        router.push('/dashboard');
       } else {
         const errorMessage = await response.text();
         console.error('Fehler beim Erstellen des Eintrags:', errorMessage);
@@ -87,7 +87,7 @@ export default function CreateEntryPage() {
       console.error('Netzwerkfehler:', err);
       setError('Netzwerkfehler. Bitte überprüfe deine Verbindung.');
     } finally {
-      setLoading(false); // Ladeanzeige deaktivieren
+      setLoading(false);
     }
   };
 
@@ -147,16 +147,7 @@ export default function CreateEntryPage() {
               name="encryptedPassword"
               type="password"
               value={formData.encryptedPassword}
-              onChange={(e) => {
-                handleChange(e);
-                if (!validatePasswordStrength(e.target.value)) {
-                  setError(
-                    'Passwort muss mindestens 8 Zeichen, eine Zahl, ein Sonderzeichen und Groß- sowie Kleinbuchstaben enthalten.'
-                  );
-                } else {
-                  setError('');
-                }
-              }}
+              onChange={handleChange}
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
@@ -209,7 +200,7 @@ export default function CreateEntryPage() {
           <button
             type="submit"
             className="w-full py-2 px-4 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600"
-            disabled={loading} // Button während des Ladens deaktivieren
+            disabled={loading}
           >
             {loading ? 'Erstellen...' : 'Erstellen'}
           </button>
