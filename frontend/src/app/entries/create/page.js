@@ -14,11 +14,44 @@ export default function CreateEntryPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false); // Zustand für Ladeanzeige
+  const [passwordStrength, setPasswordStrength] = useState(''); // Passwortstärke
   const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === 'encryptedPassword') {
+      validatePasswordStrength(value); // Passwortstärke prüfen
+    }
+  };
+
+  const validatePasswordStrength = (password) => {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    if (password.length >= minLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar) {
+      setPasswordStrength('Stark');
+    } else if (password.length >= minLength && hasUpperCase && hasLowerCase && hasNumber) {
+      setPasswordStrength('Mittel');
+    } else {
+      setPasswordStrength('Schwach');
+    }
+  };
+
+  const generatePassword = () => {
+    const length = 12;
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
+    }
+    setFormData((prev) => ({ ...prev, encryptedPassword: password }));
+    validatePasswordStrength(password); // Generiertes Passwort prüfen
   };
 
   const handleSubmit = async (e) => {
@@ -114,10 +147,37 @@ export default function CreateEntryPage() {
               name="encryptedPassword"
               type="password"
               value={formData.encryptedPassword}
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange(e);
+                if (!validatePasswordStrength(e.target.value)) {
+                  setError(
+                    'Passwort muss mindestens 8 Zeichen, eine Zahl, ein Sonderzeichen und Groß- sowie Kleinbuchstaben enthalten.'
+                  );
+                } else {
+                  setError('');
+                }
+              }}
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
+            <p
+              className={`text-sm mt-1 ${
+                passwordStrength === 'Stark'
+                  ? 'text-green-500'
+                  : passwordStrength === 'Mittel'
+                  ? 'text-yellow-500'
+                  : 'text-red-500'
+              }`}
+            >
+              Passwortstärke: {passwordStrength}
+            </p>
+            <button
+              type="button"
+              onClick={generatePassword}
+              className="mt-2 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+            >
+              Starkes Passwort generieren
+            </button>
           </div>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">

@@ -16,21 +16,22 @@ public class EncryptionUtil {
         SECRET_KEY = secretKey;
     }
 
-    private static final String ALGORITHM = "AES";
+    private static final String ALGORITHM = "AES/ECB/PKCS5Padding";
 
     public static String encrypt(String plainText) throws Exception {
         Cipher cipher = Cipher.getInstance(ALGORITHM);
-        SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+        SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY.getBytes("UTF-8"), "AES");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        byte[] encryptedBytes = cipher.doFinal(plainText.getBytes());
+        byte[] encryptedBytes = cipher.doFinal(plainText.getBytes("UTF-8"));
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
     public static String decrypt(String encryptedText) throws Exception {
         Cipher cipher = Cipher.getInstance(ALGORITHM);
-        SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+        SecretKeySpec secretKey = new SecretKeySpec(SECRET_KEY.getBytes("UTF-8"), "AES");
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedText));
-        return new String(decryptedBytes);
+        byte[] decodedBytes = Base64.getDecoder().decode(encryptedText);
+        byte[] decryptedBytes = cipher.doFinal(decodedBytes);
+        return new String(decryptedBytes, "UTF-8");
     }
 }

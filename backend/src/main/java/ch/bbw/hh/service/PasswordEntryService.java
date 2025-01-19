@@ -25,18 +25,18 @@ public class PasswordEntryService {
                 .orElseThrow(() -> new IllegalArgumentException("Benutzer nicht gefunden."));
         List<PasswordEntry> entries = repository.findAllByUser(user);
 
-        // Entschlüsseln der Passwörter vor der Rückgabe
         entries.forEach(entry -> {
             try {
                 String decryptedPassword = EncryptionUtil.decrypt(entry.getEncryptedPassword());
                 entry.setEncryptedPassword(decryptedPassword);
             } catch (Exception e) {
-                throw new RuntimeException("Fehler beim Entschlüsseln des Passworts für Eintrag ID: " + entry.getId(), e);
+                entry.setEncryptedPassword("Fehler beim Entschlüsseln");
             }
         });
 
         return entries;
     }
+
 
     public Optional<PasswordEntry> getEntryByIdForUser(Long id, String username) {
         User user = userRepository.findByUsername(username)
@@ -48,7 +48,7 @@ public class PasswordEntryService {
                 String decryptedPassword = EncryptionUtil.decrypt(e.getEncryptedPassword());
                 e.setEncryptedPassword(decryptedPassword);
             } catch (Exception ex) {
-                throw new RuntimeException("Fehler beim Entschlüsseln des Passworts für Eintrag ID: " + id, ex);
+                e.setEncryptedPassword("Fehler beim Entschlüsseln");
             }
         });
 
@@ -61,7 +61,6 @@ public class PasswordEntryService {
         entry.setUser(user);
 
         try {
-            // Passwort verschlüsseln mit AES
             String encryptedPassword = EncryptionUtil.encrypt(entry.getEncryptedPassword());
             entry.setEncryptedPassword(encryptedPassword);
         } catch (Exception e) {
@@ -70,6 +69,7 @@ public class PasswordEntryService {
 
         return repository.save(entry);
     }
+
 
     public void deleteEntry(Long id) {
         repository.deleteById(id);

@@ -73,11 +73,17 @@ export default function DashboardPage() {
   };
 
   const handleCopyPassword = (password) => {
+    if (password === "Fehler beim Entschlüsseln") {
+      alert("Das Passwort konnte nicht entschlüsselt werden.");
+      return;
+    }
+  
     navigator.clipboard.writeText(password).then(
-      () => alert('Passwort kopiert!'),
-      (err) => alert('Fehler beim Kopieren des Passworts.')
+      () => alert("Passwort kopiert!"),
+      (err) => alert("Fehler beim Kopieren des Passworts.")
     );
   };
+  
 
   if (loading) {
     return (

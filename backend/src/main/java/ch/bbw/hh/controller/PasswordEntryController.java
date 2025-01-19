@@ -49,10 +49,11 @@ public class PasswordEntryController {
                     try {
                         String decryptedPassword = EncryptionUtil.decrypt(entry.getEncryptedPassword());
                         entry.setEncryptedPassword(decryptedPassword);
+                        return ResponseEntity.ok(entry);
                     } catch (Exception e) {
-                        throw new RuntimeException("Fehler beim Entschlüsseln des Passworts", e);
+                        entry.setEncryptedPassword("Fehler beim Entschlüsseln");
+                        return ResponseEntity.ok(entry); // Passwort bleibt verschlüsselt
                     }
-                    return ResponseEntity.ok(entry);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
